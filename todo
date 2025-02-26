@@ -1,12 +1,12 @@
-- [ ] more flexible argument: size variable, biais to avoid comparing addresses etc.  
+- [x] more flexible argument: size variable, biais to avoid comparing addresses etc.  
 ie. main.py 0x0052:16:-4 0x0025:14:8
 Here: 16 and 14 means the byte_sequence len will be 14. 
 Here: -4 and 8 means too start the byte_sequence -4 byte before the addresses, or 8 byte after the addresses (same logic ofcourse apply to calculate output address)
 
-- [ ] better output: If multiple matches in the new exe. correctly set it in the output and trigger a warning
+- [x] better output: If multiple matches in the new exe. correctly set it in the output and trigger a warning
 
 - [ ] check dll support
 
-- [ ] maybe add more executable file support 
+- [ ] maybe add more executable file support like elf
 
 - [ ] try to support packed executables/DLLs by integrating dynamic analysis (e.g., emulation and memory dumping) to capture fully unpacked code in RAM. 

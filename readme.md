@@ -1,41 +1,75 @@
 # offdiff
+`offdiff` is a Python tool that takes old virtual addresses (VAs) from a previous build of a closed-source executable and returns the new addresses from an updated build, useful for tracking changes and reverse engineering.
 
-`offdiff` is a Python tool that takes old virtual addresses (VAs), as seen in debuggers like OllyDbg and CheatEngine, from a previous build of a closed-source executable and returns the new addresses from an updated build, useful for tracking changes and reverse engineering.
+---
 
-### Explanation of Addresses
-- **Virtual Address (VA):** The address in memory where a program or library resides when it's loaded. This is what debuggers like OllyDbg and CheatEngine show.
-- **Relative Virtual Address (RVA):** A virtual address adjusted relative to the base address of the module in memory.
+### Key Features
+- **Address Translation:** Map old virtual addresses to new ones across different binary versions
+- **Bias Support:** Shift byte sequence extraction to avoid unstable regions (e.g., external code addresses)
+- **Size Specification:** Define exact byte sequence lengths for precise pattern matching
+
+---
+
+### Core Concepts
+| Term | Description |
+|------|-------------|
+| **VA (Virtual Address)** | Memory address as seen in debuggers (e.g., `0x0040E00D`) |
+| **RVA (Relative VA)** | Address relative to the module's base address |
+| **Bias** | Byte offset applied to shift pattern extraction (±N bytes) |
+| **Size** | Length of the byte sequence to extract/match |
 
 ---
 
 ### Usage (Command Line)
 ```bash
-python main.py <old_addresses> <old_binary> <new_binary>
+$ python main.py <address_spec 1> <address_spec 2> ... <address_spec n> <old_binary> <new_binary>
 ```
+**address_spec** can be specified in the following formats:
+- `addr`
+- `addr:size`
+- `addr:size:bias`
 
 Where:
-- `<old_addresses>`: A space-separated list of virtual addresses (in hexadecimal) from the old binary.
-- `<old_binary>`: The path to the old binary executable.
-- `<new_binary>`: The path to the new binary executable.
+- `addr` is the address in hexadecimal (with or without the 0x prefix).
+- `size` (optional) is the length of the byte sequence to extract/match (default: 16).
+- `bias` (optional) is the byte offset applied for pattern extraction (default: 0).
 
----
+***old_binary** and **new_binary** are relative paths to the old binary (which contains the old addresses as specified in address_spec) and the new binary (the one we are looking to find the corresponding addresses in).
 
-### Usage (Python)
+
+Exemple:
+```bash
+$ python main.py 0x0040E00D:16:0 tests/shaiya/game-4mb.exe tests/shaiya/game-34mb.exe 
+
+Old Addresses: [[4251661, 16, 0]]
+Old Binary: tests/shaiya/game-4mb.exe
+New Binary: tests/shaiya/game-34mb.exe
+-----------
+[
+    [0x0040df5d],
+]
+```
+
+### Usage (python)
+
 ```python
+
 from offdiff import get_new_addresses, print_addresses
 
 new_binary = "game-4mb.exe"
 old_binary = "game-34mb.exe"
 old_addresses = [
-        0x0040E00D # becomes 0x0040e0bd in the new build
+        (0x0040E00D, 16, 4) # becomes 0x0040e0bd in new build
 ]
-output = get_new_addresses(old_addresses, old_binary, new_binary, 16)
-assert(output[0] == 0x0040e0bd)
+
+output = get_new_addresses(old_addresses, new_binary, old_binary)
+assert(output[0][0] == 0x0040e0bd)
+print_addresses(output)
+
 ```
 
----
+### Run tests of this repo:
 
-## Run tests of this repo:
 ```bash
 python tests/all.py
 ```
@@ -46,6 +80,6 @@ python tests/all.py
 - **Unpacked Executables:** `offdiff` works with unpacked executables that do not require additional unpacking or emulation for analysis.
 ---
 
-## Future Enhancements:
+### Future Enhancements:
   - see todo file
   - see todo file
