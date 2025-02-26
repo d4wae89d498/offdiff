@@ -59,15 +59,33 @@ from offdiff import get_new_addresses, print_addresses
 new_binary = "game-4mb.exe"
 old_binary = "game-34mb.exe"
 old_addresses = [
-        (0x0040E00D, 16, 4) # becomes 0x0040e0bd in new build
+        ("SahEncr",         0x0040E00D, 16, 1),    # -> 0x0040e0bd
+        ("InvetoryExit_01", 0x0051AAD5, 7, -2),   # -> 0x005186b5
+        ("InvetoryExit_02", 0x0051A5C1, 15, -2),   # -> 0x005181a1
+        ("CallNB_01",       0x0057BC50, [0xCC, 0x8B11, 0x83EC74, 0x85D2, bskip(6), 0xDB442478], -1),          # -> 0x0057b860  
+        ("InvetoryExit_03", 0x00519642,),   
+        ("JMPNB_NPCID_01",  0x00519667,),   
+        ("JMPNB_NPCID_02",  0x0051A503,),   
+        ("CallNB_02",       0x00422D40,)
 ]
+
 
 output = get_new_addresses(old_addresses, new_binary, old_binary)
 assert(output[0][0] == 0x0040e0bd)
 print_addresses(output)
-
 ```
-
+```text
+[
+SahEncr               [0x0040e0bd],
+InvetoryExit_01       [0x005186b5],
+InvetoryExit_02       [0x005181a1],
+CallNB_01             [0x0057b860],
+InvetoryExit_03       [0x005196e2],
+JMPNB_NPCID_01        [0x00519707],
+JMPNB_NPCID_02        [0x0051a5a3],
+CallNB_02             [0x00423150],
+]
+```
 ### Run tests of this repo:
 
 ```bash
