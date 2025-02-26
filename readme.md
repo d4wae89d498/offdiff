@@ -22,15 +22,15 @@ Where:
 
 ### Usage (Python)
 ```python
-import offdiff
+from offdiff import get_new_addresses, print_addresses
 
-# Example usage
-old_addresses = [0x12345678, 0x87654321]
-old_binary = 'path/to/old_binary.exe'
-new_binary = 'path/to/new_binary.exe'
-
-output = offdiff.get_new_addresses(old_addresses, old_binary, new_binary)
-print(output)
+new_binary = "game-4mb.exe"
+old_binary = "game-34mb.exe"
+old_addresses = [
+        0x0040ED # becomes 0x0040e0bd in the new build
+]
+output = get_new_addresses([0x0040E00D], os.path.join(script_root, old_binary), os.path.join(script_root, new_binary), 16)
+assert(output[0] == 0x0040e0bd)
 ```
 
 ---
