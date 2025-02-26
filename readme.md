@@ -13,7 +13,7 @@
 ### Core Concepts
 | Term | Description |
 |------|-------------|
-| **VA (Virtual Address)** | Memory address as seen in debuggers (e.g., `0x0040E00D`) |
+| **VA (Virtual Address)** | Memory address as seen in debuggers like CheatEngine or OllyDbg |
 | **RVA (Relative VA)** | Address relative to the module's base address |
 | **Bias** | Byte offset applied to shift pattern extraction (±N bytes) |
 | **Size** | Length of the byte sequence to extract/match |
