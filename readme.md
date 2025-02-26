@@ -1,6 +1,6 @@
 # offdiff
 
-`offdiff` is a Python tool designed to compare different builds of closed-source executables by retrieving and comparing virtual addresses (VAs) from their binary content. The tool is primarily used to track changes between versions of an executable, which can be useful for reverse engineering, debugging, or tracking differences in compiled code. The tool extracts bytes from the binary files using VAs, as seen in debuggers such as OllyDbg and CheatEngine.
+`offdiff` is a Python tool that takes old virtual addresses (VAs), as seen in debuggers like OllyDbg and CheatEngine, from a previous build of a closed-source executable and returns the new addresses from an updated build, useful for tracking changes and reverse engineering.
 
 ### Explanation of Addresses
 - **Virtual Address (VA):** The address in memory where a program or library resides when it's loaded. This is what debuggers like OllyDbg and CheatEngine show.
