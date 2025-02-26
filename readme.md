@@ -27,9 +27,9 @@ from offdiff import get_new_addresses, print_addresses
 new_binary = "game-4mb.exe"
 old_binary = "game-34mb.exe"
 old_addresses = [
-        0x0040ED # becomes 0x0040e0bd in the new build
+        0x0040E00D # becomes 0x0040e0bd in the new build
 ]
-output = get_new_addresses([0x0040E00D], os.path.join(script_root, old_binary), os.path.join(script_root, new_binary), 16)
+output = get_new_addresses(old_addresses, os.path.join(script_root, old_binary), os.path.join(script_root, new_binary), 16)
 assert(output[0] == 0x0040e0bd)
 ```
 
