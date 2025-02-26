@@ -9,4 +9,4 @@ Here: -4 and 8 means too start the byte_sequence -4 byte before the addresses, o
 
 - [ ] maybe add more executable file support 
 
-- [ ] 
+- [ ] try to support packed executables/DLLs by integrating dynamic analysis (e.g., emulation and memory dumping) to capture fully unpacked code in RAM. 
