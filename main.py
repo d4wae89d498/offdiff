@@ -1,5 +1,5 @@
 import sys
-from offdiff import get_new_addresses, DEFAULT_SEQ_SIZE, DEFAULT_BIAIS, print_addresses
+from offdiff import * 
 
 def main():
     # Extract command-line arguments excluding the script name
@@ -35,15 +35,16 @@ Usage: script.py [old_address1] [old_address2] ... [old_binary] [new_binary]
         items_len = len(items)
 
         if (items_len <= 0):
-            raise "Usage error."
+            raise InvalidArgumentException("Usage error.")
 
-        arguments = [int(items[0], 16), DEFAULT_SEQ_SIZE, DEFAULT_BIAIS]
+        arguments = [int(items[0], 16), DEFAULT_SEQ_SIZE, DEFAULT_BIAS]
         if items_len >= 2:
             arguments[1] = int(items[1])
         if items_len == 3:
             arguments[2] = int(items[2])
         else:
-            raise "Usage error."
+            raise InvalidArgumentException("Usage error.")
+        
         old_addresses.append(arguments)
         
     print("Old Addresses:", old_addresses)
