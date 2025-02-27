@@ -11,6 +11,7 @@ Here: -4 and 8 means too start the byte_sequence -4 byte before the addresses, o
 - [x] add strategies like: if not found, try to reduce size. If multiple, try to shift etc.
 - [x] add ability to return a map of old address or identifier to the new one
 - [ ] add ability to generate statistics
+- [ ] capstone / keystone integration / new patterns
 
 v2:
 - [ ] parallelisation
