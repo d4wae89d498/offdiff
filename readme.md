@@ -34,7 +34,7 @@ Where:
 - `size` (optional) is the length of the byte sequence to extract/match (default: 16).
 - `bias` (optional) is the byte offset applied for pattern extraction (default: 0).
 
-***old_binary** and **new_binary** are relative paths to the old binary (which contains the old addresses as specified in address_spec) and the new binary (the one we are looking to find the corresponding addresses in).
+**old_binary** and **new_binary** are relative paths to the old binary (which contains the old addresses as specified in address_spec) and the new binary (the one we are looking to find the corresponding addresses in).
 
 
 Exemple:
@@ -88,6 +88,10 @@ CallNB_02             [0x00423150],
 ```
 
 ### Advanced pattern matching using keystone // capstone
+
+```python
+# TODO
+```
 
 ### Run tests of this repo:
 
