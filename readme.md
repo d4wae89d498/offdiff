@@ -86,6 +86,9 @@ JMPNB_NPCID_02        [0x0051a5a3],
 CallNB_02             [0x00423150],
 ]
 ```
+
+### Advanced pattern matching using keystone // capstone
+
 ### Run tests of this repo:
 
 ```bash
@@ -97,7 +100,6 @@ python tests/all.py
 - **PE Format (Windows Executables):** `offdiff` supports Portable Executable (PE) files such as `.exe` and `.dll` on Windows platforms.
 - **Unpacked Executables:** `offdiff` works with unpacked executables that do not require additional unpacking or emulation for analysis.
 
-- When using pattern guessing features : **x86 32 bits** is required for now
 ---
 
 ### Future Enhancements:

@@ -12,14 +12,29 @@ md.detail = True
 
 x86 = capstone.x86
 
-# Possible pattern matching are :
+##
+##      Pattern spec:
+##
 pattern = [
 
-    [0x5588, 0x9987],   # Byte seq as int array, may contains FixedPlaceholder and EnumPlaceholder -- Placeholder shall not be first iten of seq
+    [b'\x54\x48', 0x5588, 0x9987],   # Byte seq as int array, may contains FixedPlaceholder and EnumPlaceholder -- Placeholder shall not be first iten of seq
     
     b'\x54\x48',        # Byte seq
     
-    "mov",              # Dict for description
+    
+    "mov eax, 5",       
+    "mov eax, 6",
+
+                        # assembly string that contains pattern ===> OK first first item, but variable pattern SHALL NOT be used at first
+    """                 
+        mov eax, 6      # 2 first lines will be assembled to generate prefix
+        mov ecx, 7      # so that may use .find(prefix) before trying patterns
+        mov *, 7        # Will be converted to a lambda (see bellow)
+        mov ecx, *      # Will be coverted to a lambda (see bellow)
+    """
+    
+    
+    # Dict for description ==> => SHALL not be first items of seq
     {
         'mnemonic': 'mov', 
         'operands': [
@@ -28,11 +43,13 @@ pattern = [
         ]
     },
         
-    lambda x:           #  Lambda for conditional matching => SHALL not be first items of seq
+    #  Lambda for conditional matching 
+    #  => SHALL not be first items of seq
+    lambda x:
         x.mnemonic == 'mov' 
-        and x.operands[0].type == capstone.x86.X86_OP_REG        
+        and x.operands[0].type == x86.X86_OP_REG        
         and x.operands[1].value == 'eax'
-        and x.operands[1].type == capstone.x86.X86_OP_MEM
+        and x.operands[1].type == x86.X86_OP_MEM
         and (x.operands[1].value == '5' or x.operands[1].value == '6')
 ]
 
