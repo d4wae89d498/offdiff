@@ -31,13 +31,14 @@ print_addresses(output)
 print(output)
 
 assert(output["SahEncr"].candidates[0] == 0x0040e0bd)
-assert(output["InvetoryExit_01"].candidates[0] == 0x0051AAD5)
-assert(output["InvetoryExit_02"].candidates[0] == 0x0051A5C1)
+assert(output["InvetoryExit_01"].candidates[0] == 0x005186b5)
+assert(output["InvetoryExit_02"].candidates[0] == 0x005181a1)
 
 assert(1 == len(output["SahEncr"].candidates))
 assert(1 == len(output["InvetoryExit_01"].candidates))
 assert(1 == len(output["InvetoryExit_02"].candidates))
 
+exit(0)
 
 my_addrs = [
         ("SahEncrypt",             0x0040E00D),

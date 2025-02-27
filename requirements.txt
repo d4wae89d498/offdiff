@@ -1,1 +1,4 @@
-lief==0.16.4
+mypy
+lief
+keystone-engine
+capstone

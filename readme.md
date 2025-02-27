@@ -78,6 +78,8 @@ python tests/all.py
 ### Currently supported executables
 - **PE Format (Windows Executables):** `offdiff` supports Portable Executable (PE) files such as `.exe` and `.dll` on Windows platforms.
 - **Unpacked Executables:** `offdiff` works with unpacked executables that do not require additional unpacking or emulation for analysis.
+
+- When using pattern guessing features : **x86 32 bits** is required for now
 ---
 
 ### Future Enhancements:

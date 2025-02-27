@@ -1,4 +1,5 @@
 import lief
+from pattern import *
 
 DEFAULT_BIAS = 0
 DEFAULT_SEQ_SIZE = 16
@@ -7,7 +8,6 @@ MIN_BIAS = -16
 
 class UserException(Exception):
     pass
-
 class InvalidArgumentException(UserException):
     pass
 class InvalidAddressException(UserException):
@@ -33,65 +33,6 @@ def pattern_size(pattern):
     
     return total_size
 
-def pattern_match(pattern, byte_sequence):
-    expected_size = pattern_size(pattern)
-    if len(byte_sequence) != expected_size:
-        return False
-    pos = 0
-    for item in pattern:
-        if isinstance(item, BytePlaceholder):
-            pos += item.size
-            if pos > len(byte_sequence):
-                return False
-        else:
-            bits = item.bit_length()
-            bytes_needed = (bits + 7) // 8
-            if bytes_needed == 0 and item == 0:
-                bytes_needed = 1  # Handle 0 as 1 byte
-            if pos + bytes_needed > len(byte_sequence):
-                return False
-            try:
-                expected_bytes = item.to_bytes(bytes_needed, byteorder='big')
-            except OverflowError:
-                return False
-            current_bytes = byte_sequence[pos:pos + bytes_needed]
-            if current_bytes != expected_bytes:
-                return False
-            pos += bytes_needed
-    return pos == len(byte_sequence)
-
-def extract_bytes(binary, va, size = DEFAULT_SEQ_SIZE, bias = DEFAULT_BIAS):
-    """Extract bytes from a virtual address (VA) with a bias."""
-    image_base = binary.optional_header.imagebase
-    rva = va - image_base
-    section = None
-    for sec in binary.sections:
-        if sec.virtual_address <= rva < sec.virtual_address + sec.size:
-            section = sec
-            break
-    if not section:
-        raise InvalidAddressException(f"No section found for VA 0x{va:X} (RVA 0x{rva:X}).")
-    raw_offset = rva - section.virtual_address
-    adjusted_offset = raw_offset + bias
-    if adjusted_offset < 0 or adjusted_offset + size > len(section.content):
-        raise InvalidAddressException(f"Address out of range in section '{section.name}'.")
-    return bytes(section.content[adjusted_offset : adjusted_offset + size])
-
-class BytePlaceholder:
-    def __init__(self, i):
-        self.size = i
-
-def bskip(i):
-    return BytePlaceholder(i)
-
-def pattern_size(pattern):
-    total_size = 0
-    for item in pattern:
-        if isinstance(item, BytePlaceholder):
-            total_size += item.size
-        else:
-            total_size += (item.bit_length() + 7) // 8
-    return total_size
 
 def pattern_match(pattern, byte_sequence):
     expected_size = pattern_size(pattern)
@@ -120,19 +61,47 @@ def pattern_match(pattern, byte_sequence):
             pos += bytes_needed
     return pos == len(byte_sequence)
 
-class InvalidParameterException(Exception):
-    pass
 
-DEFAULT_BIAS = 0
+
+def extract_bytes(binary, va, size = DEFAULT_SEQ_SIZE, bias = DEFAULT_BIAS):
+    """Extract bytes from a virtual address (VA) with a bias."""
+    image_base = binary.optional_header.imagebase
+    rva = va - image_base
+    section = None
+    for sec in binary.sections:
+        if sec.virtual_address <= rva < sec.virtual_address + sec.size:
+            section = sec
+            break
+    if not section:
+        raise InvalidAddressException(f"No section found for VA 0x{va:X} (RVA 0x{rva:X}).")
+    raw_offset = rva - section.virtual_address
+    adjusted_offset = raw_offset + bias
+    if adjusted_offset < 0 or adjusted_offset + size > len(section.content):
+        raise InvalidAddressException(f"Address out of range in section '{section.name}'.")
+    return bytes(section.content[adjusted_offset : adjusted_offset + size])
+
 
 def find_bytes(binary, byte_sequence, bias=DEFAULT_BIAS, pattern=None):
     """Find all virtual addresses (VA) where the byte sequence or pattern occurs."""
     if pattern and not pattern_match(pattern, byte_sequence):
-        raise InvalidParameterException("byte sequence doesn't match pattern")
+        raise InvalidArgumentException("byte sequence doesn't match pattern")
     if pattern:
         print("ITS A MATCH")
     image_base = binary.optional_header.imagebase
     matches = []
+    
+    first_pattern = b''
+    if pattern is not None and len(pattern):
+        if isinstance(pattern[0], BytePlaceholder):
+            raise InvalidAddressException("First element of a pattern shall not be a placeholder, use bias if you need.")
+        first_pattern = pattern[0].to_bytes((pattern[0].bit_length() + 7) // 8, byteorder='big')
+        i = 1
+        while not isinstance(pattern[i], BytePlaceholder):
+            first_pattern += pattern[i].to_bytes((pattern[i].bit_length() + 7) // 8, byteorder='big')
+            i += 1
+        print(first_pattern)
+        
+
     
     expected_size = pattern_size(pattern) if pattern else len(byte_sequence)
     
@@ -145,14 +114,17 @@ def find_bytes(binary, byte_sequence, bias=DEFAULT_BIAS, pattern=None):
             continue
         
         if pattern:
-            # Search for pattern matches
-            for index in range(sec_length - expected_size + 1):
+            index = content.find(first_pattern)
+            while index != -1:
+                if index % 100:
+                    print(index)
                 current_chunk = content[index:index + expected_size]
                 if pattern_match(pattern, current_chunk):
                     va = sec_va_start + index - bias
                     matches.append(va)
-                    if len(matches) > 10:
-                        break
+                if len(matches) > 10:
+                    break
+                index = content.find(first_pattern, index + 1)
         else:
             # Search for the byte_sequence
             index = content.find(byte_sequence)
@@ -168,8 +140,9 @@ def hex_dump(byte_sequence):
     """Format a byte sequence into a hex dump."""
     return " ".join(f"{byte:02X}" for byte in byte_sequence)
 
+from abc import abstractmethod, ABC
 
-class AddressMatchingAbstractStrategy():
+class AddressMatchingAbstractStrategy(ABC):
         def __init__(
             self, 
             min_seq_size=MIN_SEQ_SIZE, 
@@ -182,8 +155,9 @@ class AddressMatchingAbstractStrategy():
                 self.default_seq_size = default_seq_size
                 self.default_bias = default_bias
         
+        @abstractmethod
         def get_new_address_candidates(self, old_va, old_binary, new_binary, pattern = None):
-                raise NotImplementedError("This method should be overridden by subclasses.")
+                pass
 
 from strategies import DefaultStrategy
 
@@ -234,6 +208,20 @@ def get_new_addresses(old_addresses, old_binary_path, new_binary_path, strategy 
         strategy.pattern = pattern
         new_addresses[item[0]] = AddressCandidate(old_va, strategy.get_new_address_candidates(old_va, old_binary, new_binary, pattern))
     return new_addresses
+
+def get_statistics(address_groups):
+    nb_empty = 0
+    nb_ok = 0
+    nb_ambiguity = 0
+    for name, value in address_groups.items():
+        nb_candidate = len(value.candidates)
+        if nb_candidate == 0:
+            nb_empty += 1
+        elif nb_candidate == 1:
+            nb_ok += 1
+        else:
+            nb_ambiguity += 1
+    pass
 
 def print_addresses(address_groups, num_format='hex', addresses_per_line=8):
     """Pretty print offdiff results"""

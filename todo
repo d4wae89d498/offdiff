@@ -7,12 +7,13 @@ Here: -4 and 8 means too start the byte_sequence -4 byte before the addresses, o
 - [x] better output: If multiple matches in the new exe. correctly set it in the output and trigger a warning
 - [x] pattern matching
 - [ ] add pattern matching support to the command line console ??
+- [ ] generate pattern !
 - [x] add strategies like: if not found, try to reduce size. If multiple, try to shift etc.
 - [x] add ability to return a map of old address or identifier to the new one
 - [ ] add ability to generate statistics
-- [ ] parallelisation
 
 v2:
+- [ ] parallelisation
 - [ ] maybe add more executable file support like elf
 - [ ] csv output with ability to use multiple new executables instead of one 
 - [ ] try to support packed executables/DLLs by integrating dynamic analysis (e.g., emulation and memory dumping) to capture fully unpacked code in RAM. 

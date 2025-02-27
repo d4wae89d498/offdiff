@@ -1,0 +1,2 @@
+class FixedPlaceholder():
+        pass

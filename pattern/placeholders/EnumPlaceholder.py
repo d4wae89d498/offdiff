@@ -1,0 +1,2 @@
+class EnumPlaceholder():
+        pass
